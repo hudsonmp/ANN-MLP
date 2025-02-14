@@ -1,0 +1,106 @@
+---
+description: Literally a description of the objective of this repo
+globs: .md
+---
+
+# Project: MNIST Handwritten Digit Recognition with a NumPy MLP (From Scratch)
+
+## Overview
+
+This project involves building a Multi-Layer Perceptron (MLP) neural network *from scratch* using only Python and NumPy to classify handwritten digits from the MNIST dataset.  This is a "from scratch" implementation, meaning we will **not** be using high-level libraries like TensorFlow or Keras for the core neural network logic.  We will implement forward propagation, backpropagation, and gradient descent manually.
+
+## Objectives
+
+*   **Implement an MLP from scratch:**  Write the code for all the core components of an MLP using only Python and NumPy.
+*   **Understand Neural Network Fundamentals:**  Gain a deep understanding of forward propagation, backpropagation, gradient descent, activation functions, and weight initialization.
+*   **Achieve Reasonable Accuracy:**  Train the network to achieve a reasonable level of accuracy on the MNIST dataset.
+*   **Practice NumPy Proficiency:**  Develop skills in using NumPy for matrix operations and array manipulation.
+*   **No TensorFlow/Keras:**  The core network logic must be implemented without relying on TensorFlow, Keras, or other high-level deep learning libraries.  We can use other libraries for data loading and visualization.
+
+## Core Technologies
+
+*   **Python:** The primary programming language.
+*   **NumPy:** For efficient numerical operations (matrix multiplication, array manipulation).
+*   **Jupyter Notebook (via Cursor):**  The interactive development environment.
+*   **MNIST Dataset:**  The handwritten digit dataset.  We will use the `python-mnist` library to load it (avoids TensorFlow dependency).
+*   **Matplotlib:** For visualizing the data, training progress, and results.
+*   **`python-mnist` library:** Specifically for loading the MNIST dataset without TensorFlow.  (Install with `pip install python-mnist`)
+
+## Learning Resources
+
+*   **CS229 Lecture 2:** Essential for the mathematical foundations of neural networks (forward propagation, backpropagation, gradient descent).
+*   **3Blue1Brown's Neural Networks Series (YouTube):** For building intuition.
+*   **NumPy Documentation:** For understanding array operations.
+* **Michael Nielsen's Neural Networks and Deep Learning book:**
+
+## Detailed Project Structure
+
+The project will be structured as a Jupyter Notebook (`mnist_mlp_from_scratch.ipynb`) with the following sections:
+
+1.  **Setup and Imports:**
+    *   Import necessary libraries (`numpy`, `matplotlib`, `mnist`).
+    *   Load the MNIST dataset using the `python-mnist` library.
+    *   Explore the data (shapes, visualize samples).
+
+2.  **Data Preprocessing:**
+    *   Normalize pixel values to the range [0, 1].
+    *   Reshape images into vectors (784 elements).
+    *   One-hot encode the labels.
+
+3.  **Activation Functions:**
+    *   Implement `sigmoid`, `sigmoid_derivative`, `relu`, `relu_derivative`, and `softmax` functions using NumPy.  Include mathematical formulas in comments.
+
+4.  **Weight Initialization:**
+    *   Implement Xavier/Glorot initialization (either uniform or normal variant).
+
+5.  **Forward Propagation:**
+    *   Implement the `forward_propagation` function.
+
+6.  **Backpropagation:**
+    *   Implement the `backpropagation` function. This is the most mathematically complex part.
+
+7.  **Gradient Descent:**
+    *   Implement the `update_parameters` function (mini-batch gradient descent).
+
+8.  **Training Loop:**
+    *   Implement the `train_mlp` function, combining all the previous components.
+    *   Include loss and accuracy calculation (`calculate_loss`, `calculate_accuracy`) within the training loop.
+    *    Print training progress (loss and accuracy) after each epoch.
+
+9.  **Evaluation:**
+    *   Implement the `evaluate_mlp` function.
+    *   Evaluate the trained model on the test set.
+    *   Visualize misclassified examples.
+
+10. **Experimentation (Optional, but Highly Recommended):**
+    *   Experiment with different network architectures (number of layers, neurons per layer).
+    *   Experiment with different activation functions.
+    *   Experiment with different learning rates and batch sizes.
+    *   Try different weight initialization strategies.
+
+## `.cursorrules` File (Essential!)
+
+A `.cursorrules` file **must** be created in the same directory as the notebook.  This file will guide Cursor to provide appropriate assistance, specifically:
+
+*   **Reinforce the "no TensorFlow/Keras" rule.**
+*   Emphasize the use of NumPy for all array operations.
+*   Encourage detailed explanations of mathematical concepts.
+*   Prompt Cursor to generate complete, runnable code.
+
+**(See previous responses for the full `.cursorrules` content.  Make sure "Include .cursorrules file" is enabled in Cursor's settings.)**
+
+## Expected Workflow with Cursor
+
+*   Use **separate Composer chats** for each major section (data loading, preprocessing, activation functions, etc.).
+*   Use the provided **detailed instructions for Cursor** (from the previous response) as prompts.  These are designed to be used sequentially.
+*   **Read Cursor's output *very* carefully.**  Don't blindly accept the generated code. Understand it, debug it, and correct any errors.
+*   **Ask clarifying questions:** If you don't understand something, ask Cursor to explain it in more detail.  Use `@` to refer to documentation if needed (although we don't have TensorFlow/Keras docs this time).
+*   **Iterate:** You will likely need to refine your prompts and iterate with Cursor to get the code working correctly.
+
+## Key Considerations
+
+*   **Numerical Stability:** Pay close attention to numerical stability, especially in the `softmax` and backpropagation implementations.  Cursor should be prompted to address this.
+*   **Vectorization:**  Leverage NumPy's vectorized operations for efficiency. Avoid explicit loops whenever possible.
+*   **Debugging:** Use `print` statements liberally to inspect intermediate values and track down errors.  The Jupyter Notebook environment makes this easy.
+
+This project is significantly more challenging than using TensorFlow/Keras. It requires a strong understanding of the underlying mathematics and careful implementation. However, it will provide a much deeper understanding of how neural networks work. Good luck!

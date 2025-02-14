@@ -1,0 +1,288 @@
+---
+description: Specific Instructions
+globs: *.md
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+
+- Don't use `typing.Optional` - use `| None` instead.
+- Use single quotes for strings.
+- Use NumPy for all array operations.
+- Prefer f-strings for string formatting.
+- Include type hints for all function arguments and return values.
+- Include docstrings for all functions.
+- Do not write any code outside of functions, classes, or import statements, unless specifically instructed.
+- Do not add any conversational text, only code. Only add comments where specifically asked for.
+- Do not use `plt.show()`. Return the figure instead.
+- Adhere to PEP 8 style guidelines, except for line length, which can be up to 100 characters.
+Project: MNIST MLP from Scratch - Optimized for Cursor
+
+(Use separate Composer chats for each numbered section below.)
+
+Chat 1: Imports
+
+Cursor, generate all necessary import statements for this project:
+
+@codebase We will build a multi-layer perceptron from scratch using NumPy for numerical operations and Matplotlib for visualization.  We will use the `python-mnist` library to load the MNIST dataset.  Provide *only* the complete import statements, and nothing else. No conversational text.
+Chat 2: Data Loading and Visualization
+
+Cursor, load, inspect, and visualize the MNIST dataset:
+
+@codebase Load the MNIST dataset using the `python-mnist` library. Provide complete, runnable Python code.
+
+# Load the training and testing images and labels into separate NumPy arrays:
+# train_images, train_labels, test_images, test_labels.
+
+# Display the shape of each of the four arrays: train_images, train_labels, test_images, test_labels.
+# Print the shapes to the console.
+
+# Display the first 5 images from train_images along with their corresponding labels from train_labels, using Matplotlib.
+# Create a single figure with 5 subplots.
+# Use `plt.imshow` to display the images.
+# Set the title of each subplot to the corresponding label.
+# Return the figure. Do NOT use plt.show().
+# Include type hints and a docstring.
+Chat 3: Data Preprocessing
+
+Cursor, preprocess the MNIST data:
+
+@codebase Perform the following preprocessing steps on the MNIST data. Provide complete, runnable Python code with type hints and docstrings for all functions.
+
+# 1. Normalize the pixel data:
+# Normalize the `train_images` and `test_images` arrays to the range 0-1.
+# Explain why normalization is important in a comment.
+# Store the normalized data in new variables: `train_images_normalized`, `test_images_normalized`.
+
+# 2. Reshape the images:
+# Reshape the normalized `train_images_normalized` and `test_images_normalized` arrays into vectors of length 784.
+# Store the reshaped data in new variables: `train_images_reshaped`, `test_images_reshaped`.
+
+# 3. One-hot encode the labels:
+# One-hot encode the `train_labels` and `test_labels` arrays using only NumPy.
+# Explain the concept of one-hot encoding in a comment.
+# Store the one-hot encoded labels in new variables: `train_labels_onehot`, `test_labels_onehot`.
+
+# After completing all steps, print the shapes of `train_images_reshaped`, `train_labels_onehot`, `test_images_reshaped`, and `test_labels_onehot` to verify the results.
+Chat 4: Activation Functions
+
+Cursor, implement the activation functions and their derivatives:
+
+@codebase Implement the following activation functions and their derivatives in Python using NumPy.  Include the mathematical formulas in comments. Provide complete, runnable code with type hints and docstrings for all functions.
+
+# 1. Sigmoid:
+# Implement the sigmoid function: `sigmoid(x: np.ndarray) -> np.ndarray`.
+
+# 2. Sigmoid Derivative:
+# Implement the derivative of the sigmoid function: `sigmoid_derivative(x: np.ndarray) -> np.ndarray`.
+#   Note: The input `x` is the *output* of the sigmoid function.
+
+# 3. ReLU:
+# Implement the ReLU function: `relu(x: np.ndarray) -> np.ndarray`.
+
+# 4. ReLU Derivative:
+# Implement the derivative of the ReLU function: `relu_derivative(x: np.ndarray) -> np.ndarray`.
+
+# 5. Softmax:
+# Implement the softmax function: `softmax(x: np.ndarray) -> np.ndarray`.
+# Ensure numerical stability. Explain the stabilization technique in a comment.
+Chat 5: Weight Initialization
+
+Cursor, implement Xavier/Glorot weight initialization:
+
+@codebase Implement Xavier/Glorot initialization (use the uniform distribution variant) in Python using NumPy.
+
+# Explain Xavier/Glorot initialization and its importance in a comment. Include the formula.
+
+# Create a function `initialize_parameters(layer_sizes: list[int]) -> tuple[list[np.ndarray], list[np.ndarray]]`.
+#   `layer_sizes`: A list of integers representing the number of neurons in each layer (including input and output).
+#   The function should return a tuple containing two lists:
+#       - A list of weight matrices.
+#       - A list of bias vectors.
+# Initialize the weights and biases according to Xavier/Glorot initialization.
+
+# Include type hints and a docstring.
+Chat 6: Forward Propagation
+
+Cursor, implement forward propagation:
+
+@codebase Implement the forward propagation algorithm for a multi-layer perceptron in Python using NumPy.
+
+# Create a function:
+# `forward_propagation(X: np.ndarray, weights: list[np.ndarray], biases: list[np.ndarray], activation_functions: list[str]) -> tuple[list[np.ndarray], list[np.ndarray]]`
+
+# Arguments:
+#   X: Input data (a batch of images).
+#   weights: List of weight matrices.
+#   biases: List of bias vectors.
+#   activation_functions: List of activation function names (strings, e.g., ['relu', 'softmax']).
+
+# Return Value:
+#   A tuple containing two lists:
+#       - `activations`: A list of activations for each layer (including the input layer).
+#       - `zs`: A list of pre-activation values ("z" values) for each layer.  (z = Wx + b)
+
+# Steps:
+#   1. Initialize an empty list `activations` and add the input `X` as the first element.
+#   2. Initialize an empty list `zs`.
+#   3. Iterate through the layers (from 0 to len(weights) - 1):
+#       a. Calculate the pre-activation value: z = W * A_prev + b  (where A_prev is the activation from the previous layer).
+#       b. Apply the corresponding activation function (use a conditional statement or a dictionary to select the correct function based on the `activation_functions` list).
+#       c. Append the calculated `z` to the `zs` list.
+#       d. Append the activation (result of the activation function) to the `activations` list.
+#   4. Return the `activations` and `zs` lists.
+
+# Include type hints and a docstring.  Include comments explaining each step, referencing the mathematical formulas.
+Chat 7: Backpropagation
+
+Cursor, implement backpropagation:
+
+@codebase Implement the backpropagation algorithm for a multi-layer perceptron in Python using NumPy.
+
+# Create a function:
+# `backpropagation(X: np.ndarray, y: np.ndarray, weights: list[np.ndarray], biases: list[np.ndarray], activations: list[np.ndarray], zs: list[np.ndarray], activation_functions: list[str]) -> tuple[list[np.ndarray], list[np.ndarray]]`
+
+# Arguments:
+#  X: Input data.
+#  y: One-hot encoded target labels.
+#  weights: List of weight matrices.
+#  biases: List of bias vectors.
+#  activations: List of activations from the forward pass.
+#  zs: List of pre-activation values ("z" values) from the forward pass.
+#   activation_functions: List of activation function names (strings).
+
+# Return Value:
+#  A tuple containing two lists:
+#      - `weight_gradients`: List of gradients for the weights.
+#      - `bias_gradients`: List of gradients for the biases.
+
+# Steps:
+#   1. Initialize empty lists `weight_gradients` and `bias_gradients`.
+#   2. Calculate the error for the output layer:  dZ = A - Y  (where A is the final activation and Y is the one-hot encoded labels).  This assumes cross-entropy loss.
+#   3. Iterate through the layers in *reverse* order (from len(weights) - 1 down to 0):
+#       a. Calculate the gradient of the weights: dW = (1/m) * dZ . A_prev.T   (where m is the batch size and A_prev is the activation from the *previous* layer).
+#       b. Calculate the gradient of the biases: db = (1/m) * sum(dZ, axis=1, keepdims=True)
+#       c. Calculate the error for the *previous* layer: dZ_prev = W.T . dZ * g'(z_prev)  (where W is the weight matrix of the *current* layer, g' is the derivative of the activation function of the *previous* layer, and z_prev is the pre-activation value of the *previous* layer).
+#       d. Update dZ for the next iteration: dZ = dZ_prev
+#       e. Insert the calculated dW and db at the *beginning* of the `weight_gradients` and `bias_gradients` lists, respectively (to maintain the correct order).
+
+#   4. Return the `weight_gradients` and `bias_gradients` lists.
+# Include type hints and a docstring. Include comments explaining each step, referencing the chain rule and derivatives.
+# Use the activation derivative functions (sigmoid_derivative, relu_derivative) you defined earlier.
+Chat 8: Gradient Descent
+
+Cursor, implement mini-batch gradient descent:
+
+@codebase Implement the parameter update step using mini-batch gradient descent in Python using NumPy.
+
+# Create a function:
+# `update_parameters(weights: list[np.ndarray], biases: list[np.ndarray], weight_gradients: list[np.ndarray], bias_gradients: list[np.ndarray], learning_rate: float) -> None`
+
+# Arguments:
+#   weights: List of weight matrices.
+#   biases: List of bias vectors.
+#   weight_gradients: List of gradients for the weights.
+#   bias_gradients: List of gradients for the biases.
+#   learning_rate: The learning rate.
+
+# The function should update the weights and biases *in place* (modify the original lists).
+
+# Steps:
+#   Iterate through the layers (from 0 to len(weights) - 1):
+#     Update each weight matrix and bias vector using the gradient descent update rule:
+#       W = W - learning_rate * dW
+#       b = b - learning_rate * db
+
+# Include type hints and a docstring.  Explain the update rule in a comment.
+# This function does not return anything; it modifies the `weights` and `biases` lists directly.
+Chat 9: Loss and Accuracy, Training Loop
+
+Cursor, implement the training loop, including loss and accuracy calculations:
+
+@codebase Combine all the previous functions into a complete training loop for the MLP.
+
+# 1. Cross-Entropy Loss:
+# Implement a function `calculate_loss(y_pred: np.ndarray, y_true: np.ndarray) -> float` that computes the cross-entropy loss.
+#   Include the mathematical formula in a comment.
+
+# 2. Accuracy:
+# Implement a function `calculate_accuracy(y_pred: np.ndarray, y_true: np.ndarray) -> float` to compute the accuracy.
+
+# 3. Training Loop:
+# Create a function `train_mlp(X: np.ndarray, y: np.ndarray, layer_sizes: list[int], activation_functions: list[str], epochs: int, batch_size: int, learning_rate: float) -> tuple[list[np.ndarray], list[np.ndarray]]`
+
+# Arguments:
+#    X: Training images (reshaped).
+#    y: Training labels (one-hot encoded).
+#    layer_sizes: List of layer sizes.
+#    activation_functions: List of activation functions.
+#    epochs: Number of training epochs.
+#    batch_size: Mini-batch size.
+#    learning_rate: Learning rate.
+
+# Return value:  A tuple containing the trained weights and biases.
+
+# Steps:
+#  a. Initialize weights and biases using `initialize_parameters`.
+#  b. Iterate for the specified number of epochs.
+#  c. In each epoch:
+#      i.   Shuffle the training data (X and y) *together* using NumPy's `permutation`.
+#      ii.  Divide the data into mini-batches.
+#      iii. For each mini-batch:
+#           1.  Perform forward propagation using `forward_propagation`.
+#           2.  Perform backpropagation using `backpropagation`.
+#           3.  Update parameters using `update_parameters`.
+#      iv.  Calculate and print the training loss and accuracy *for the entire epoch* (using the `calculate_loss` and `calculate_accuracy` functions).  Use the *unshuffled* data for this calculation.
+
+# Include type hints and a docstring. Include clear comments.
+Chat 10: Evaluation
+
+Python
+
+Cursor, create the evaluation function and visualize misclassified images:
+
+@codebase Create a function to evaluate the trained model and visualize some misclassified examples.
+
+# 1. Evaluation Function:
+# Create a function `evaluate_mlp(X: np.ndarray, y: np.ndarray, weights: list[np.ndarray], biases: list[np.ndarray], activation_functions: list[str]) -> float`:
+#   Arguments:
+#       X: Test images (reshaped).
+#       y: Test labels (one-hot encoded).
+#       weights: Trained weights.
+#       biases: Trained biases.
+#       activation_functions: List of activation functions.
+#   Return Value: The accuracy on the test set (a float).
+# Steps:
+#   a. Perform forward propagation using the test data and trained parameters.
+#    b. Calculate and return the accuracy using `calculate_accuracy`.
+
+# 2. Visualize Misclassified Images:
+# Create a function:
+# `visualize_misclassified(X: np.ndarray, y: np.ndarray, y_pred: np.ndarray, num_images: int = 10) -> plt.Figure`
+#    Arguments:
+#       X: Test images (original 28x28 shape).
+#       y: Test labels (original integer labels, *not* one-hot encoded).
+#     y_pred: Predicted labels (integer labels, *not* probabilities).
+#     num_images: The number of misclassified images to display.
+#  Return Value: A Matplotlib figure.
+# Steps:
+# a. Find the indices of the misclassified images.
+# b. Randomly select `num_images` of these indices.
+# c. Create a Matplotlib figure with `num_images` subplots.
+# d. For each selected misclassified image:
+#    i.  Display the image using `plt.imshow`.
+#   ii. Set the title of the subplot to show the predicted and true labels.
+#   iii.  Turn off the axes.
+#  e.  Return the figure. Do NOT use plt.show()
+
+# 3. Main Evaluation:
+# Show how to use the `evaluate_mlp` function to evaluate the model (trained in the previous step) on the test data and print the test accuracy.
+# Call `visualize_misclassified` to display 10 misclassified images, passing in the *original* test images (28x28), original test labels, and predicted labels. You'll need to convert the one-hot encoded labels back to integers.
+
+# Include type hints and a docstring. Include comments.
+
+# Include type hints and a docstring. Include comments.
+
