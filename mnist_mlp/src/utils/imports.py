@@ -1,4 +1,5 @@
 # Basic scientific computing
+import pandas as pd
 import numpy as np
 
 # Visualization
@@ -11,4 +12,4 @@ from sklearn.metrics import accuracy_score
 # System utilities
 import os
 import struct
-from typing import Tuple, List 
+from typing import Tuple, List
