@@ -54,22 +54,13 @@ def predict_digit(request):
     try:
         # Parse the JSON data from the request
         data = json.loads(request.body)
-        image_data = data.get('image')
+        pixels = data.get('image')
         
-        # Remove the data URL prefix if present
-        if image_data.startswith('data:image/png;base64,'):
-            image_data = image_data.replace('data:image/png;base64,', '')
-        
-        # Convert base64 to image
-        image_bytes = base64.b64decode(image_data)
-        image = Image.open(io.BytesIO(image_bytes))
-        
-        # Convert to grayscale and resize
-        image = image.convert('L')
-        image = image.resize((28, 28))
-        
-        # Convert to numpy array
-        image_array = np.array(image)
+        if not pixels or len(pixels) != 784:  # 28x28 = 784
+            return JsonResponse({'error': 'Invalid image data'}, status=400)
+            
+        # Convert to numpy array and reshape
+        image_array = np.array(pixels, dtype='float32').reshape(28, 28)
         
         # Debug: Print image statistics
         print(f"Image shape: {image_array.shape}")
@@ -92,20 +83,11 @@ def predict_digit(request):
         exp_preds = np.exp(predictions - np.max(predictions))
         probabilities = exp_preds / np.sum(exp_preds)
         
-        # Debug: Print prediction probabilities
-        print(f"Raw predictions: {probabilities.ravel()}")
-        
-        # Get predicted digit and confidence
-        predicted_digit = np.argmax(probabilities)
-        probs = probabilities.ravel()
-        confidence = float(probs[predicted_digit])
-        
-        print(f"Predicted digit: {predicted_digit}, Confidence: {confidence}")
+        # Get predicted digit
+        predicted_digit = int(np.argmax(probabilities))
         
         return JsonResponse({
-            'digit': int(predicted_digit),
-            'confidence': confidence,
-            'probabilities': probs.tolist()
+            'prediction': predicted_digit
         })
         
     except Exception as e:
