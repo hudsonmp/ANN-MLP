@@ -34,12 +34,24 @@ class Perceptron:
         self.model_type = model_type
         
         # Initialize weights and bias
-        self.weights = np.random.randn(n_features) * 0.01
-        self.bias = 0.0
+        self.weights = np.random.randn(n_features) * 0.01  # Initialize weights with small random values
+        self.bias = 0.0  # Initialize bias term separately
         
         # Training history
         self.loss_history = []
+    
+    def linear(self, inputs: np.ndarray) -> np.ndarray:
+        """Compute linear activation.
         
+        Args:
+            inputs: Input values
+            
+        Returns:
+            Linear activation of the inputs
+        """
+        Z = np.dot(inputs, self.weights) + self.bias
+        return Z
+    
     def _sigmoid(self, z: np.ndarray) -> np.ndarray:
         """Compute the sigmoid function.
         
@@ -52,6 +64,20 @@ class Perceptron:
         # Clip values to avoid overflow
         z = np.clip(z, -500, 500)
         return 1 / (1 + np.exp(-z))
+    
+    def _step(self, z: np.ndarray) -> np.ndarray:
+        """Compute the Heaviside step function.
+        
+        Args:
+            z: Input values
+            
+        Returns:
+            Binary step output (0 or 1) for each input value
+        """
+        if self.model_type == 'linear':
+            return z
+        else:
+            return np.where(z >= 0, 1, 0)
     
     def _forward(self, X: np.ndarray) -> np.ndarray:
         """Compute forward pass.
@@ -97,15 +123,12 @@ class Perceptron:
         Returns:
             Tuple of (weight gradients, bias gradient)
         """
-        m = X.shape[0]
-        error = y_pred - y_true
+        m = X.shape[0]  # Number of training examples
+        error = y_pred - y_true  # Difference between predictions and actual values
         
-        if self.model_type == 'logistic':
-            dw = np.dot(X.T, error) / m
-            db = np.mean(error)
-        else:
-            dw = np.dot(X.T, error) / m
-            db = np.mean(error)
+        # Same formula for both linear and logistic regression
+        dw = np.dot(X.T, error) / m  # Gradient for weights
+        db = np.mean(error)          # Gradient for bias
             
         return dw, db
     
@@ -139,7 +162,7 @@ class Perceptron:
             
         return self
     
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, Z: np.ndarray) -> np.ndarray:
         """Make predictions for input features.
         
         Args:
@@ -148,7 +171,7 @@ class Perceptron:
         Returns:
             Predictions (probabilities for logistic regression, real values for linear regression)
         """
-        return self._forward(X)
+        return self._forward(Z)
     
     def predict_classes(self, X: np.ndarray) -> np.ndarray:
         """Predict class labels for input features.
