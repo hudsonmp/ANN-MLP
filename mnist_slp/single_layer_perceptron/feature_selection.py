@@ -3,7 +3,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
 from typing import Tuple, List
 from .mnist_loader import load_mnist_data
-from utils.feature_selection import BackwardFeatureSelector
+from mnist_slp.single_layer_perceptron.feature_selection import BackwardFeatureSelector
 import matplotlib.pyplot as plt
 import seaborn as sns
 
