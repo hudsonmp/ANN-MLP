@@ -177,7 +177,6 @@ class BackwardFeatureSelector:
 
         return pixels_to_remove.tolist(), ~pixels_to_remove_mask
 
-
 def main():
     """
     Example usage of the BackwardFeatureSelector with visualization.
