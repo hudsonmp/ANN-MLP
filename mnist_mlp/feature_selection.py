@@ -2,8 +2,6 @@ import numpy as np
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
 from typing import Tuple, List
-from .mnist_loader import load_mnist_data
-from utils.feature_selection import BackwardFeatureSelector
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -77,8 +75,8 @@ class BackwardFeatureSelector:
         return importance_scores
 
     def select_features(
-        self, X: np.ndarray, y: np.ndarray, n_features_to_keep: int = None
-    ) -> Tuple[np.ndarray, List[int]]:
+        self, X: np.ndarray, y: np.ndarray, n_features_to_keep: int | None = None
+    ) -> Tuple[np.ndarray, List[int], int]:
         """
         Perform backward feature selection.
 
@@ -88,13 +86,13 @@ class BackwardFeatureSelector:
             n_features_to_keep (int, optional): Number of features to keep
 
         Returns:
-            Tuple[np.ndarray, List[int]]: Selected features and their indices
+            Tuple[np.ndarray, List[int], int]: Selected features, their indices, and number of features
         """
         # First remove low variance features
         X_filtered, selected_indices = self.remove_low_variance_features(X)
 
         if n_features_to_keep is None:
-            return X_filtered, selected_indices
+            return X_filtered, selected_indices, X_filtered.shape[1]
 
         # Calculate importance scores for remaining features
         importance_scores = self.evaluate_feature_importance(X_filtered, y)
@@ -103,10 +101,10 @@ class BackwardFeatureSelector:
         top_features = np.argsort(importance_scores)[-n_features_to_keep:]
         final_selected_features = [selected_indices[i] for i in top_features]
 
-        return X_filtered[:, top_features], final_selected_features
+        return X_filtered[:, top_features], final_selected_features, len(final_selected_features)
 
     def create_pixel_intensity_heatmap(
-        self, X: np.ndarray, save_path: str = None
+        self, X: np.ndarray, save_path: str | None = None
     ) -> np.ndarray:
         """
         Create a heatmap showing the average pixel intensity across all samples.
@@ -176,51 +174,3 @@ class BackwardFeatureSelector:
         pixels_to_remove = np.where(pixels_to_remove_mask.flatten())[0]
 
         return pixels_to_remove.tolist(), ~pixels_to_remove_mask
-
-def main():
-    """
-    Example usage of the BackwardFeatureSelector with visualization.
-    """
-    # Load MNIST data
-    X_train, y_train, X_test, y_test = load_mnist_data()
-
-    # Initialize feature selector
-    selector = BackwardFeatureSelector(variance_threshold=0.01)
-
-    # Create and save pixel intensity heatmap
-    avg_intensities = selector.create_pixel_intensity_heatmap(
-        X_train, save_path="mnist_mlp/pixel_intensity_heatmap.png"
-    )
-
-    # Analyze low activity pixels
-    pixels_to_remove, keep_mask = selector.analyze_low_activity_pixels(
-        X_train, intensity_threshold=0.05, occurrence_threshold=0.02
-    )
-
-    print(f"Original number of features: {X_train.shape[1]}")
-    print(f"Number of consistently low-intensity pixels: {len(pixels_to_remove)}")
-    print(f"Pixels to remove (first 10): {pixels_to_remove[:10]}...")
-
-    # Remove low activity pixels
-    X_filtered = np.delete(X_train, pixels_to_remove, axis=1)
-
-    # Perform additional feature selection if desired
-    remaining_features_to_keep = 392 - len(pixels_to_remove)
-    if remaining_features_to_keep > 0:
-        X_selected, selected_features = selector.select_features(
-            X_filtered, y_train, n_features_to_keep=remaining_features_to_keep
-        )
-
-        print(f"\nAfter variance-based selection:")
-        print(f"Number of selected features: {len(selected_features)}")
-        print(f"Selected feature indices: {selected_features[:10]}...")
-
-    # Calculate and print variance statistics
-    print(f"\nVariance statistics of original features:")
-    print(f"Mean variance: {np.mean(selector.feature_variances):.4f}")
-    print(f"Max variance: {np.max(selector.feature_variances):.4f}")
-    print(f"Min variance: {np.min(selector.feature_variances):.4f}")
-
-
-if __name__ == "__main__":
-    main()

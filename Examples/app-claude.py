@@ -1,11 +1,11 @@
 # app.py
 from flask import Flask, request, jsonify, send_from_directory
 import numpy as np
-from model import MLP
 from PIL import Image
 import io
 import base64
 import os
+from mnist_mlp.mlp import MultiLayerPerceptron as MLP
 
 app = Flask(__name__)
 model = MLP()
