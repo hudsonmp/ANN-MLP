@@ -25,10 +25,10 @@ def num_observations():
 		model = build_model(X,32,2)
 		model, losses = train(model,X, y, reg_lambda=reg_lambda, learning_rate=learning_rate)
 		losses_store.append(losses)
-		print losses
+		print(losses)
 	x = np.linspace(0,145,30)
 	for i in range(len(losses_store)):
-		lab = 'n_observations = ' + str(obs_values[i])
+		lab = f'n_observations = {obs_values[i]}'
 		plt.plot(x,losses_store[i],label=lab)
 	plt.legend()
 	plt.show()
@@ -46,10 +46,10 @@ def noise():
 		model = build_model(X,32,2)
 		model, losses = train(model,X, y, reg_lambda=reg_lambda, learning_rate=learning_rate)
 		losses_store.append(losses)
-		print losses
+		print(losses)
 	x = np.linspace(0,145,30)
 	for i in range(len(losses_store)):
-		lab = 'noise_value = ' + str(noise_values[i])
+		lab = f'noise_value = {noise_values[i]}'
 		plt.plot(x,losses_store[i],label=lab)
 	plt.legend()
 	plt.show()
@@ -67,10 +67,10 @@ def reg():
 		model = build_model(X,32,2)
 		model, losses = train(model,X, y, reg_lambda=reg_lambda, learning_rate=learning_rate)
 		losses_store.append(losses)
-		print losses
+		print(losses)
 	x = np.linspace(0,145,30)
 	for i in range(len(losses_store)):
-		lab = 'regularization_value = ' + str(reg_values[i])
+		lab = f'regularization_value = {reg_values[i]}'
 		plt.plot(x,losses_store[i],label=lab)
 	plt.legend()
 	plt.show()
@@ -89,10 +89,10 @@ def lr():
 		model = build_model(X,32,2)
 		model, losses = train(model,X, y, reg_lambda=reg_lambda, learning_rate=learning_rate)
 		losses_store.append(losses)
-		print losses
+		print(losses)
 	x = np.linspace(0,145,30)
 	for i in range(len(losses_store)):
-		lab = 'learning rate = ' + str(lr_values[i])
+		lab = f'learning rate = {lr_values[i]}'
 		plt.plot(x,losses_store[i],label=lab)
 	plt.legend()
 	plt.show()
@@ -110,21 +110,22 @@ def test_num_nodes():
 		model = build_model(X,val,2)
 		model, losses = train(model,X, y, reg_lambda=reg_lambda, learning_rate=learning_rate)
 		losses_store.append(losses)
-		print losses
+		print(losses)
 	x = np.linspace(0,145,30)
 	for i in range(len(losses_store)):
-		lab = 'n_nodes = ' + str(node_vals[i])
+		lab = f'n_nodes = {node_vals[i]}'
 		plt.plot(x,losses_store[i],label=lab)
 	plt.legend()
 	plt.show()
 
-print "number of observations:"
-num_observations()
-print 'noise:'
-noise()
-print 'regularization:'
-reg()
-print 'learning rate:'
-lr()
-print 'hidden nodes:'
-test_num_nodes()
+if __name__ == "__main__":
+	print("Number of observations:")
+	num_observations()
+	print('noise:')
+	noise()
+	print('regularization:')
+	reg()
+	print('learning rate:')
+	lr()
+	print('hidden nodes:')
+	test_num_nodes()

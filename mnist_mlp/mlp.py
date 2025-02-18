@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Tuple, Dict
 from sklearn.model_selection import KFold
-from .feature_selection import BackwardFeatureSelector
+from feature_selection import BackwardFeatureSelector
 
 
 class MultiLayerPerceptron:
@@ -17,8 +17,8 @@ class MultiLayerPerceptron:
     
     def __init__(
         self,
-        input_size: int = 784,
-        hidden_size: int = 128, 
+        input_size: int = 130,
+        hidden_size: int = 43,
         output_size: int = 10,
         learning_rate: float = 0.01,
         batch_size: int = 32,

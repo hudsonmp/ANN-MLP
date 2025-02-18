@@ -1,0 +1,45 @@
+Training Results Summary
+======================
+
+Configuration:
+- Learning Rate: 0.01
+- Epochs: 100
+- Accuracy: 0.9516
+- Training Time: 12.24 seconds
+
+Configuration:
+- Learning Rate: 0.01
+- Epochs: 500
+- Accuracy: 0.9469
+- Training Time: 59.58 seconds
+
+Configuration:
+- Learning Rate: 0.01
+- Epochs: 1000
+- Accuracy: 0.9416
+- Training Time: 116.93 seconds
+
+Configuration:
+- Learning Rate: 0.001
+- Epochs: 100
+- Accuracy: 0.9329
+- Training Time: 11.48 seconds
+
+Configuration:
+- Learning Rate: 0.001
+- Epochs: 500
+- Accuracy: 0.9511
+- Training Time: 56.66 seconds
+
+Configuration:
+- Learning Rate: 0.001
+- Epochs: 1000
+- Accuracy: 0.9523
+- Training Time: 114.61 seconds
+
+
+Best Configuration:
+Learning Rate: 0.001
+Epochs: 1000
+Accuracy: 0.9523
+Training Time: 114.61 seconds
