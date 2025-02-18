@@ -1,5 +1,5 @@
 import numpy as np
-from mlp import MultiLayerPerceptron
+from mnist_mlp.mlp import MultiLayerPerceptron
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
 import os
@@ -8,7 +8,7 @@ import time
 
 def load_processed_data() -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Load the preprocessed MNIST data with selected features."""
-    data_dir = 'processed_data'
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'processed_data')
     
     try:
         # Load and ensure arrays are float32 for features and int32 for labels
@@ -16,6 +16,10 @@ def load_processed_data() -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarra
         X_test = np.load(os.path.join(data_dir, 'X_test_selected.npy'), allow_pickle=True).astype(np.float32)
         y_train = np.load(os.path.join(data_dir, 'y_train.npy'), allow_pickle=True).astype(np.int32)
         y_test = np.load(os.path.join(data_dir, 'y_test.npy'), allow_pickle=True).astype(np.int32)
+        
+        # Binarize the images using a threshold of 0.5
+        X_train = (X_train > 0.5).astype(np.float32)
+        X_test = (X_test > 0.5).astype(np.float32)
         
         # Verify data shapes
         print(f"Loaded data shapes:")
@@ -62,9 +66,9 @@ def train_and_evaluate(
             print(f"\nConfiguration {config_count}/{total_configs}")
             print(f"Training with learning_rate={lr}, epochs={epochs}")
             
-            # Initialize model with correct input and hidden sizes
+            # Initialize model with larger architecture
             input_size = X_train.shape[1]
-            hidden_size = input_size // 3
+            hidden_size = 256  # Fixed larger hidden size
             
             try:
                 model = MultiLayerPerceptron(
@@ -92,18 +96,16 @@ def train_and_evaluate(
                 print("\nClassification Report:")
                 print(classification_report(y_test, y_pred, digits=4))
                 
-                # Save model if it's configuration 6 (lr=0.001, epochs=1000)
-                if lr == 0.001 and epochs == 1000:
-                    print("\nSaving model weights for web application...")
-                    weights_data = {
-                        'weights': model.weights,
-                        'biases': model.biases,
-                        'input_size': input_size,
-                        'hidden_size': hidden_size,
-                        'output_size': 10
-                    }
-                    np.save('model/weights.npy', weights_data)
-                    print("Model weights saved successfully!")
+                # Save model weights
+                weights_data = {
+                    'weights': model.weights,
+                    'biases': model.biases,
+                    'input_size': input_size,
+                    'hidden_size': hidden_size,
+                    'output_size': 10
+                }
+                np.save('model/weights.npy', weights_data)
+                print("Model weights saved successfully!")
                 
                 # Plot and save learning curve
                 plt.figure(figsize=(10, 5))
@@ -134,10 +136,10 @@ def main():
     print("Starting MLP training and evaluation...")
     
     try:
-        # Train only the best configuration
+        # Train with best configuration
         results = train_and_evaluate(
             epochs_list=[1000],
-            learning_rates=[0.001]
+            learning_rates=[0.001]  # Using only the best learning rate
         )
         
         if not results:

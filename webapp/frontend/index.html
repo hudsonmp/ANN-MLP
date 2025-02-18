@@ -3,44 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNIST Digit Recognition</title>
+    <title>MNIST Digit Recognition - Test Interface</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
             <h1>MNIST Digit Recognition</h1>
-            <p class="subtitle">Draw a digit (0-9) in the canvas below</p>
+            <p class="subtitle">Click on a digit to test the model's prediction</p>
         </header>
 
         <main class="main-content">
-            <div class="canvas-container">
-                <canvas id="drawingCanvas" width="280" height="280"></canvas>
-                <div class="tools">
-                    <div class="brush-size">
-                        <label for="brushSize">Brush Size:</label>
-                        <input type="range" id="brushSize" min="10" max="30" value="20">
-                    </div>
-                    <div class="buttons">
-                        <button id="predictBtn" class="btn btn-primary">
-                            <span class="btn-icon">🔍</span>
-                            Predict
-                        </button>
-                        <button id="clearBtn" class="btn btn-danger">
-                            <span class="btn-icon">🗑️</span>
-                            Clear
-                        </button>
-                    </div>
+            <div class="test-samples-container">
+                <div class="samples-grid" id="samplesGrid">
+                    <!-- Test samples will be loaded here -->
+                </div>
+                <div class="buttons">
+                    <button id="newSamplesBtn" class="btn btn-primary">
+                        <span class="btn-icon">🔄</span>
+                        Load New Samples
+                    </button>
                 </div>
             </div>
 
             <div class="results-container">
-                <div id="prediction" class="prediction-result"></div>
-                <div id="confidence-meter" class="confidence-meter">
-                    <div class="confidence-bar"></div>
+                <div id="currentPrediction" class="current-prediction">
+                    <h3>Current Prediction</h3>
+                    <div class="prediction-details">
+                        Click a digit to see the prediction
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Correct Predictions:</span>
+                        <span id="correctCount" class="stat-value">0/0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Average Confidence:</span>
+                        <span id="avgConfidence" class="stat-value">0%</span>
+                    </div>
                 </div>
                 <div class="history">
-                    <h3>Previous Predictions</h3>
+                    <h3>Previous Results</h3>
                     <ul id="predictionHistory" class="prediction-list"></ul>
                 </div>
             </div>
@@ -50,9 +54,9 @@
             <p>Built with NumPy and Flask</p>
             <p class="instructions">
                 Instructions:
-                <span class="instruction-step">1. Draw a single digit</span>
-                <span class="instruction-step">2. Click Predict</span>
-                <span class="instruction-step">3. Clear and try again!</span>
+                <span class="instruction-step">1. Click on any digit to test the model</span>
+                <span class="instruction-step">2. See the model's prediction</span>
+                <span class="instruction-step">3. Load new samples to try more</span>
             </p>
         </footer>
     </div>

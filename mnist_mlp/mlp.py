@@ -1,7 +1,6 @@
 import numpy as np
 from typing import List, Tuple, Dict
 from sklearn.model_selection import KFold
-from feature_selection import BackwardFeatureSelector
 
 
 class MultiLayerPerceptron:
@@ -17,10 +16,10 @@ class MultiLayerPerceptron:
     
     def __init__(
         self,
-        input_size: int = 130,
-        hidden_size: int = 43,
+        input_size: int = 600,
+        hidden_size: int = 256,
         output_size: int = 10,
-        learning_rate: float = 0.01,
+        learning_rate: float = 0.001,
         batch_size: int = 32,
         max_iterations: int = 1000,
         random_state: int | None = None
@@ -251,27 +250,6 @@ class MultiLayerPerceptron:
         """
         probas = self.predict_proba(X)
         return np.argmax(probas, axis=1)
-    
-    @staticmethod
-    def perform_feature_selection(
-        X: np.ndarray,
-        y: np.ndarray,
-        variance_threshold: float = 0.01,
-        n_features_to_keep: int | None = None
-    ) -> Tuple[np.ndarray, List[int], int]:
-        """Perform feature selection using BackwardFeatureSelector.
-        
-        Args:
-            X: Input data of shape (n_samples, n_features)
-            y: Target labels
-            variance_threshold: Minimum variance threshold for features
-            n_features_to_keep: Number of features to keep after selection
-            
-        Returns:
-            Tuple of (selected features array, indices of selected features, number of selected features)
-        """
-        selector = BackwardFeatureSelector(variance_threshold=variance_threshold)
-        return selector.select_features(X, y, n_features_to_keep)
     
     @classmethod
     def cross_validate_hyperparameters(

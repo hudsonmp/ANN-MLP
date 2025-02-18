@@ -168,17 +168,28 @@ def main():
     """
     Example usage of the BackwardFeatureSelector.
     """
-    # Load MNIST data
-    from mnist_loader import MNISTLoader  # Local import
-    loader = MNISTLoader(normalization='standard')
-    X_train, y_train, X_test, y_test = loader.load_mnist()
-
-    # Initialize feature selector
-    selector = BackwardFeatureSelector(variance_threshold=0.01)
+    # Load MNIST data directly from OpenML
+    print("Loading MNIST dataset...")
+    from sklearn.datasets import fetch_openml
+    from sklearn.model_selection import train_test_split
     
-    # Analyze low activity pixels
+    X, y = fetch_openml('mnist_784', version=1, return_X_y=True, as_frame=False)
+    X = X / 255.0  # Normalize pixel values
+    y = y.astype(np.int32)
+    
+    # Split into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    # Initialize feature selector with more lenient threshold
+    selector = BackwardFeatureSelector(variance_threshold=0.001)  # Reduced from 0.01
+    
+    # Analyze low activity pixels with more lenient thresholds
     pixels_to_remove, keep_mask = selector.analyze_low_activity_pixels(
-        X_train, intensity_threshold=0.05, occurrence_threshold=0.02
+        X_train, 
+        intensity_threshold=0.02,  # Reduced from 0.05
+        occurrence_threshold=0.01   # Reduced from 0.02
     )
 
     print(f"Original number of features: {X_train.shape[1]}")
@@ -189,8 +200,8 @@ def main():
     X_train_filtered = np.delete(X_train, pixels_to_remove, axis=1)
     X_test_filtered = np.delete(X_test, pixels_to_remove, axis=1)
 
-    # Perform additional feature selection if desired
-    remaining_features_to_keep = 457 - len(pixels_to_remove)
+    # Keep more features after filtering
+    remaining_features_to_keep = 600  # Increased from 457
     if remaining_features_to_keep > 0:
         X_train_selected, selected_features, n_selected = selector.select_features(
             X_train_filtered, y_train, n_features_to_keep=remaining_features_to_keep
