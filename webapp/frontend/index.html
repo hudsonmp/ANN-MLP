@@ -3,60 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNIST Digit Recognition - Test Interface</title>
+    <title>Digit Detective - AI Recognition Game</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>MNIST Digit Recognition</h1>
-            <p class="subtitle">Click on a digit to test the model's prediction</p>
+            <div class="game-title">
+                <h1>Digit Detective</h1>
+                <div class="badge-container" id="badgeContainer">
+                    <!-- Badges will appear here -->
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-pill">
+                    <span class="stat-icon">🏆</span>
+                    <span id="score">Score: 0</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-icon">🔥</span>
+                    <span id="streak">Streak: 0</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-icon">⭐</span>
+                    <span id="highScore">Best: 0</span>
+                </div>
+            </div>
         </header>
 
         <main class="main-content">
-            <div class="test-samples-container">
-                <div class="samples-grid" id="samplesGrid">
-                    <!-- Test samples will be loaded here -->
-                </div>
-                <div class="buttons">
-                    <button id="newSamplesBtn" class="btn btn-primary">
-                        <span class="btn-icon">🔄</span>
-                        Load New Samples
-                    </button>
-                </div>
+            <div class="game-modes">
+                <button id="practiceMode" class="mode-btn active">Practice Mode</button>
+                <button id="timeMode" class="mode-btn">Time Challenge</button>
+                <button id="vsMode" class="mode-btn">Human vs AI</button>
             </div>
 
-            <div class="results-container">
-                <div id="currentPrediction" class="current-prediction">
-                    <h3>Current Prediction</h3>
-                    <div class="prediction-details">
-                        Click a digit to see the prediction
+            <div class="game-area">
+                <div class="test-samples-container">
+                    <div class="vs-mode-header" id="vsModeHeader" style="display: none;">
+                        <div class="player-score human">
+                            <span class="player-icon">👤</span>
+                            <span class="player-name">You</span>
+                            <span id="humanScore">0/0</span>
+                            <span id="humanAccuracy">0%</span>
+                            <span id="humanTime">0.0s</span>
+                        </div>
+                        <div class="vs-divider">VS</div>
+                        <div class="player-score ai">
+                            <span class="player-icon">🤖</span>
+                            <span class="player-name">AI</span>
+                            <span id="aiScore">0/0</span>
+                            <span id="aiAccuracy">0%</span>
+                            <span id="aiTime">0.0s</span>
+                        </div>
+                    </div>
+                    
+                    <div class="vs-game-container" id="vsGameContainer" style="display: none;">
+                        <div class="round-info">
+                            <span class="round-number">Round <span id="currentRound">1</span>/10</span>
+                            <span class="round-timer" id="roundTimer">0.0s</span>
+                        </div>
+                        
+                        <div class="digit-display">
+                            <div class="samples-grid" id="samplesGrid">
+                                <!-- Test samples will be loaded here -->
+                            </div>
+                        </div>
+
+                        <div class="vs-mode-controls" id="vsModeControls">
+                            <div class="number-pad">
+                                <div class="number-row">
+                                    <button class="number-btn" data-number="1">1</button>
+                                    <button class="number-btn" data-number="2">2</button>
+                                    <button class="number-btn" data-number="3">3</button>
+                                </div>
+                                <div class="number-row">
+                                    <button class="number-btn" data-number="4">4</button>
+                                    <button class="number-btn" data-number="5">5</button>
+                                    <button class="number-btn" data-number="6">6</button>
+                                </div>
+                                <div class="number-row">
+                                    <button class="number-btn" data-number="7">7</button>
+                                    <button class="number-btn" data-number="8">8</button>
+                                    <button class="number-btn" data-number="9">9</button>
+                                </div>
+                                <div class="number-row">
+                                    <button class="number-btn" data-number="0">0</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feedback-popup" id="feedbackPopup">
+                        <div class="feedback-content">
+                            <div class="feedback-icon"></div>
+                            <div class="feedback-message"></div>
+                        </div>
+                    </div>
+
+                    <div class="buttons">
+                        <button id="newSamplesBtn" class="btn btn-primary">
+                            <span class="btn-icon">🔄</span>
+                            New Digits
+                        </button>
+                        <button id="startVsBtn" class="btn btn-secondary" style="display: none;">
+                            <span class="btn-icon">🎮</span>
+                            Start Round
+                        </button>
                     </div>
                 </div>
-                <div class="stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Correct Predictions:</span>
-                        <span id="correctCount" class="stat-value">0/0</span>
+
+                <div class="results-container">
+                    <div id="currentPrediction" class="current-prediction">
+                        <h3>AI's Guess</h3>
+                        <div class="prediction-details">
+                            Pick a digit to start!
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Average Confidence:</span>
-                        <span id="avgConfidence" class="stat-value">0%</span>
+                    
+                    <div class="game-feedback" id="gameFeedback">
+                        <!-- Feedback animations will appear here -->
                     </div>
-                </div>
-                <div class="history">
-                    <h3>Previous Results</h3>
-                    <ul id="predictionHistory" class="prediction-list"></ul>
+
+                    <div class="achievements" id="achievements">
+                        <h3>Recent Achievements</h3>
+                        <div class="achievement-list">
+                            <!-- Achievements will appear here -->
+                        </div>
+                    </div>
+
+                    <div class="vs-results" id="vsResults" style="display: none;">
+                        <h3>Round Results</h3>
+                        <div class="round-stats">
+                            <!-- Round statistics will appear here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
 
+        <div id="timeBar" class="time-bar">
+            <div class="time-progress"></div>
+        </div>
+
         <footer class="footer">
-            <p>Built with NumPy and Flask</p>
+            <div class="quick-stats">
+                <span>Accuracy: <span id="accuracy">0%</span></span>
+                <span>Games Played: <span id="gamesPlayed">0</span></span>
+            </div>
             <p class="instructions">
-                Instructions:
-                <span class="instruction-step">1. Click on any digit to test the model</span>
-                <span class="instruction-step">2. See the model's prediction</span>
-                <span class="instruction-step">3. Load new samples to try more</span>
+                <span class="instruction-step">🎯 Click digits to test the AI</span>
+                <span class="instruction-step">⏱️ Try Time Challenge mode!</span>
+                <span class="instruction-step">🤖 Challenge the AI in VS mode!</span>
             </p>
         </footer>
     </div>

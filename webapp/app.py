@@ -4,6 +4,9 @@ from sklearn.datasets import fetch_openml
 import os
 import sys
 import random
+import base64
+from PIL import Image
+import io
 
 # Add the parent directory to Python path to import the MLP
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -69,6 +72,18 @@ def load_mnist_data():
         print(f"Error loading MNIST data: {str(e)}")
         raise
 
+# Convert numpy array to base64 image
+def array_to_base64(array):
+    # Reshape and scale to 0-255
+    image = (array.reshape(28, 28) * 255).astype(np.uint8)
+    # Convert to PIL Image
+    img = Image.fromarray(image)
+    # Save to bytes buffer
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    # Convert to base64
+    return base64.b64encode(buffer.getvalue()).decode()
+
 # Load the model and test data
 model = None
 X_test = None
@@ -83,61 +98,49 @@ def initialize():
 
 initialize()
 
-# Get random test samples (without predictions)
-@app.route('/get_test_samples', methods=['GET'])
-def get_test_samples():
+# Get random samples for the game
+@app.route('/get_samples', methods=['GET'])
+def get_samples():
     try:
-        # Get 5 random indices
-        sample_indices = random.sample(range(len(X_test)), 5)
+        # Get 9 random indices for a 3x3 grid
+        sample_indices = random.sample(range(len(X_test)), 9)
         samples = []
         
         for idx in sample_indices:
-            # Get the full image for display (all 784 pixels)
             image = X_test[idx]
-            true_label = int(y_test[idx])
+            label = int(y_test[idx])
             
             samples.append({
                 'id': idx,
-                'pixels': image.tolist(),  # Send all pixels for display
-                'true_label': true_label
+                'image': array_to_base64(image),
+                'label': label
             })
         
         return jsonify(samples)
     except Exception as e:
-        print(f"Error getting test samples: {str(e)}")
+        print(f"Error getting samples: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# Make prediction for a single sample
-@app.route('/predict/<int:sample_id>', methods=['GET'])
-def predict_sample(sample_id):
+# Make prediction for a sample
+@app.route('/predict', methods=['POST'])
+def predict():
     try:
-        # Get the full image
-        image = X_test[sample_id]
-        true_label = int(y_test[sample_id])
+        data = request.json
+        image_data = base64.b64decode(data['image'])
         
-        # Select only the features used during training
-        image_selected = image[selected_features]
+        # Convert back to numpy array
+        image = Image.open(io.BytesIO(image_data))
+        image_array = np.array(image.convert('L')) / 255.0
+        image_array = image_array.reshape(-1)
         
-        # Verify the input shape matches the model's expected input
-        if len(image_selected) != model.input_size:
-            raise ValueError(f"Feature mismatch: got {len(image_selected)} features, model expects {model.input_size}")
-        
-        # Make prediction
+        # Select features and make prediction
+        image_selected = image_array[selected_features]
         pred_proba = model.predict_proba(image_selected.reshape(1, -1))
         predicted_label = int(np.argmax(pred_proba))
         confidence = float(pred_proba[0][predicted_label])
         
-        # Log prediction details for debugging
-        print(f"Prediction details:")
-        print(f"- Sample ID: {sample_id}")
-        print(f"- True label: {true_label}")
-        print(f"- Predicted label: {predicted_label}")
-        print(f"- Confidence: {confidence:.4f}")
-        print(f"- Number of features used: {len(image_selected)}")
-        
         return jsonify({
-            'true_label': true_label,
-            'predicted_label': predicted_label,
+            'prediction': predicted_label,
             'confidence': confidence
         })
     except Exception as e:
