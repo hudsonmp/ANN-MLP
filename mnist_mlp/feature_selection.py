@@ -171,7 +171,8 @@ def main():
     # Load MNIST data directly from OpenML
     print("Loading MNIST dataset...")
     from sklearn.datasets import fetch_openml
-    from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import train_test_split, cross_val_score
+    from sklearn.linear_model import LogisticRegression
     
     X, y = fetch_openml('mnist_784', version=1, return_X_y=True, as_frame=False)
     X = X / 255.0  # Normalize pixel values
@@ -182,47 +183,86 @@ def main():
         X, y, test_size=0.2, random_state=42
     )
 
-    # Initialize feature selector with more lenient threshold
-    selector = BackwardFeatureSelector(variance_threshold=0.001)  # Reduced from 0.01
+    # Initialize feature selector with extremely lenient threshold
+    selector = BackwardFeatureSelector(variance_threshold=0.00001)  # Almost zero threshold
     
-    # Analyze low activity pixels with more lenient thresholds
+    # First pass: Remove only completely inactive pixels
     pixels_to_remove, keep_mask = selector.analyze_low_activity_pixels(
         X_train, 
-        intensity_threshold=0.02,  # Reduced from 0.05
-        occurrence_threshold=0.01   # Reduced from 0.02
+        intensity_threshold=0.001,  # Extremely low threshold
+        occurrence_threshold=0.001   # Extremely low threshold
     )
 
     print(f"Original number of features: {X_train.shape[1]}")
-    print(f"Number of consistently low-intensity pixels: {len(pixels_to_remove)}")
+    print(f"Number of completely inactive pixels: {len(pixels_to_remove)}")
     print(f"Pixels to remove (first 10): {pixels_to_remove[:10]}...")
 
-    # Remove low activity pixels from both training and test sets
+    # Remove the completely inactive pixels
     X_train_filtered = np.delete(X_train, pixels_to_remove, axis=1)
     X_test_filtered = np.delete(X_test, pixels_to_remove, axis=1)
-
-    # Keep more features after filtering
-    remaining_features_to_keep = 600  # Increased from 457
-    if remaining_features_to_keep > 0:
-        X_train_selected, selected_features, n_selected = selector.select_features(
-            X_train_filtered, y_train, n_features_to_keep=remaining_features_to_keep
-        )
-        # Apply the same feature selection to test set
-        X_test_selected = X_test_filtered[:, selected_features]
-
-        print(f"\nAfter feature selection:")
-        print(f"Number of selected features: {n_selected}")
-        print(f"Selected feature indices: {selected_features[:10]}...")
+    
+    print("\nEvaluating feature importance using cross-validation...")
+    
+    # Evaluate baseline performance with all features
+    base_model = LogisticRegression(max_iter=1000, n_jobs=-1)
+    base_scores = cross_val_score(base_model, X_train_filtered, y_train, cv=5, n_jobs=-1)
+    base_mean = base_scores.mean()
+    print(f"Baseline CV accuracy with all features: {base_mean:.4f}")
+    
+    # Calculate feature importance scores
+    importance_scores = selector.evaluate_feature_importance(X_train_filtered, y_train)
+    
+    # Sort features by importance
+    sorted_indices = np.argsort(importance_scores)
+    
+    # Try removing least important features in small batches
+    best_n_features = X_train_filtered.shape[1]
+    best_score = base_mean
+    step_size = 50  # Try removing 50 features at a time
+    
+    for n_features in range(X_train_filtered.shape[1] - step_size, 300, -step_size):
+        selected_indices = sorted_indices[-n_features:]
+        X_train_subset = X_train_filtered[:, selected_indices]
         
-        # Save the processed data
-        selector.save_processed_data(
-            X_train_selected, X_test_selected, y_train, y_test, selected_features
-        )
+        # Evaluate performance with current feature subset
+        cv_scores = cross_val_score(base_model, X_train_subset, y_train, cv=5, n_jobs=-1)
+        mean_score = cv_scores.mean()
+        
+        print(f"Features: {n_features}, CV accuracy: {mean_score:.4f}")
+        
+        # If performance drops significantly, stop
+        if mean_score < best_score - 0.001:  # Allow only 0.1% accuracy drop
+            break
+        
+        best_score = mean_score
+        best_n_features = n_features
+    
+    print(f"\nOptimal number of features: {best_n_features}")
+    
+    # Select the final features
+    final_indices = sorted_indices[-best_n_features:]
+    X_train_selected = X_train_filtered[:, final_indices]
+    X_test_selected = X_test_filtered[:, final_indices]
+    
+    # Map back to original feature indices
+    remaining_indices = np.delete(np.arange(X.shape[1]), pixels_to_remove)
+    selected_features = remaining_indices[final_indices].tolist()
+    
+    print(f"\nAfter feature selection:")
+    print(f"Number of selected features: {len(selected_features)}")
+    print(f"Selected feature indices: {selected_features[:10]}...")
+    
+    # Save the processed data
+    selector.save_processed_data(
+        X_train_selected, X_test_selected, y_train, y_test, selected_features
+    )
 
     # Calculate and print variance statistics
-    print(f"\nVariance statistics of original features:")
-    print(f"Mean variance: {np.mean(selector.feature_variances):.4f}")
-    print(f"Max variance: {np.max(selector.feature_variances):.4f}")
-    print(f"Min variance: {np.min(selector.feature_variances):.4f}")
+    print(f"\nVariance statistics of selected features:")
+    final_variances = np.var(X_train_selected, axis=0)
+    print(f"Mean variance: {np.mean(final_variances):.4f}")
+    print(f"Max variance: {np.max(final_variances):.4f}")
+    print(f"Min variance: {np.min(final_variances):.4f}")
 
 
 if __name__ == "__main__":
