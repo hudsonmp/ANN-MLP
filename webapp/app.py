@@ -44,7 +44,8 @@ def load_model_and_features():
         # Load selected features
         selected_features = np.load(features_path, allow_pickle=True)
         
-        print("Model and features loaded successfully!")
+        print(f"Model loaded successfully with {len(selected_features)} features!")
+        print(f"Model architecture: input_size={weights_data['input_size']}, hidden_size={weights_data['hidden_size']}")
         return model, selected_features
     except Exception as e:
         print(f"Error loading model and features: {str(e)}")
@@ -78,6 +79,7 @@ def initialize():
     global model, X_test, y_test, selected_features
     model, selected_features = load_model_and_features()
     X_test, y_test = load_mnist_data()
+    print(f"Initialization complete. Model will use {len(selected_features)} features for prediction.")
 
 initialize()
 
@@ -90,13 +92,13 @@ def get_test_samples():
         samples = []
         
         for idx in sample_indices:
-            # Get the image and its true label
+            # Get the full image for display (all 784 pixels)
             image = X_test[idx]
             true_label = int(y_test[idx])
             
             samples.append({
-                'id': idx,  # Include the index for reference
-                'pixels': image.tolist(),  # Send full image for display
+                'id': idx,
+                'pixels': image.tolist(),  # Send all pixels for display
                 'true_label': true_label
             })
         
@@ -113,13 +115,25 @@ def predict_sample(sample_id):
         image = X_test[sample_id]
         true_label = int(y_test[sample_id])
         
-        # Select features for prediction
+        # Select only the features used during training
         image_selected = image[selected_features]
+        
+        # Verify the input shape matches the model's expected input
+        if len(image_selected) != model.input_size:
+            raise ValueError(f"Feature mismatch: got {len(image_selected)} features, model expects {model.input_size}")
         
         # Make prediction
         pred_proba = model.predict_proba(image_selected.reshape(1, -1))
         predicted_label = int(np.argmax(pred_proba))
         confidence = float(pred_proba[0][predicted_label])
+        
+        # Log prediction details for debugging
+        print(f"Prediction details:")
+        print(f"- Sample ID: {sample_id}")
+        print(f"- True label: {true_label}")
+        print(f"- Predicted label: {predicted_label}")
+        print(f"- Confidence: {confidence:.4f}")
+        print(f"- Number of features used: {len(image_selected)}")
         
         return jsonify({
             'true_label': true_label,
